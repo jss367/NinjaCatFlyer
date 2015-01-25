@@ -12,6 +12,20 @@ public class CatController : MonoBehaviour {
 
 	public ParticleSystem jetpack;
 
+	private bool dead = false;
+	void OnTriggerEnter2D(Collider2D collider)
+	{
+		Debug.Log ("Triggered!");
+		HitByLaser (collider);
+	}
+
+	void HitByLaser(Collider2D laserCollider)
+	{
+		dead = true;
+		Debug.Log ("I've been hit!");
+		animator.SetBool ("dead", true);
+	}
+
 	// Use this for initialization
 	void Start () {
 		animator = GetComponent<Animator> ();
@@ -25,13 +39,18 @@ public class CatController : MonoBehaviour {
 	void FixedUpdate() {
 		bool jetpackActive = Input.GetButton ("Fire1");
 
-		if (jetpackActive) {
-						rigidbody2D.AddForce (new Vector2 (0, jetpackForce));
-				}
-		Vector2 newVelocity = rigidbody2D.velocity;
-		newVelocity.x = forwardMovementSpeed;
-		rigidbody2D.velocity = newVelocity;
+		jetpackActive = jetpackActive && !dead;
 
+		if (jetpackActive) {
+				rigidbody2D.AddForce (new Vector2 (0, jetpackForce));
+		}
+
+		if (!dead)
+		{
+			Vector2 newVelocity = rigidbody2D.velocity;
+			newVelocity.x = forwardMovementSpeed;
+			rigidbody2D.velocity = newVelocity;
+		}
 		UpdateGroundedStatus ();
 
 		AdjustJetpack (jetpackActive);
